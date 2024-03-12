@@ -1,0 +1,60 @@
+name: release
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+      - name: Create Release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+  publish:
+    name: publish ${{ matrix.name }}
+    needs:
+      - release
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - target: x86_64-pc-windows-gnu
+            suffix: windows-x86_64
+            platform: windows-latest
+            archive: zip
+            name: x86_64-pc-windows-gnu
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Clone test repository
+        uses: actions/checkout@v3
+
+      - name: Setup Rust toolchain and cache
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: nightly
+
+      - name: Build
+        run: cargo +nightly -Z unstable-options b -r --out-dir ./release
+
+      - name: Collect windows artifacts
+        if: matrix.platform == 'windows-latest'
+        run: |
+          Compress-Archive -Path $env:GITHUB_WORKSPACE/release/* -DestinationPath $env:GITHUB_WORKSPACE/bms-kneeboard-server_${{ matrix.name }}.${{ matrix.archive }}
+
+      - name: Upload artifacts
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: "bms-kneeboard-server_${{ matrix.name }}.${{ matrix.archive }}"

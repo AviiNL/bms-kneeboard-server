@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script>
+        const evtSource = new EventSource("/sse");
+        evtSource.addEventListener("poke", (e) => {
+            console.log("Got a poke");
+            // Reload on a poke
+            location.reload();
+        });
+    </script>
+
+    <style>
+        html,
+        body {
+            background-color: #FFF;
+            font-family: sans-serif;
+            font-size: 14pt;
+            margin: 0px;
+        }
+
+
+        table {
+            width: 100%;
+            border-spacing: 1px;
+            border-collapse: separate;
+            border-color: #FFF;
+        }
+
+        th {
+            font-variant: small-caps;
+        }
+
+        th {
+            background: #CCC;
+        }
+
+        th.leader {
+            background: #000;
+            color: #FFF;
+        }
+
+        td {
+            text-align: left;
+            padding: 1px 2px;
+        }
+
+        tr.steerpoint td:first-child {
+            text-align: center;
+        }
+
+        tr.steerpoint {
+            background-color: #CEE;
+        }
+
+        tr.steerpoint:nth-child(odd) {
+            background-color: #ACC;
+        }
+
+        tr.comm {
+            background-color: #ECE;
+        }
+
+        tr.comm:nth-child(odd) {
+            background-color: #CAC;
+        }
+
+        tr.element {
+            background-color: #ECE;
+        }
+
+        tr.element td:first-child {
+            text-align: center;
+        }
+
+        tr.element.primary {
+            font-weight: bold;
+        }
+
+        tr.element:nth-child(odd) {
+            background-color: #ECC;
+        }
+    </style>
+</head>
+
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th colspan="10" class="leader">
+                    Package Elements
+                </th>
+            </tr>
+            <tr>
+                <th>#</th>
+                <th>callsign</th>
+                <th>flight #</th>
+                <th>Role</th>
+                <th>aircraft</th>
+                <th>task</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each package_elements}}
+            <tr class="element{{#if is_primary}} primary{{/if}}">
+                <td>{{ index }}</td>
+                <td>{{{ callsign.clone().replace("\n", "<br />") }}}</td>
+                <td>{{{ flight.clone().replace("\n", "<br />") }}}</td>
+                <td>{{{ role.clone().replace("\n", "<br />") }}}</td>
+                <td>{{{ aircraft.clone().replace("\n", "<br />") }}}</td>
+                <td>{{{ task.clone().replace("\n", "<br />") }}}°</td>
+            </tr>
+            {{~/each}}
+        </tbody>
+    </table>
+
+    <table>
+        <thead>
+            <tr>
+                <th colspan="10" class="leader">
+                    Steerpoints
+                </th>
+            </tr>
+            <tr>
+                <th>#</th>
+                <th>desc</th>
+                <th>time</th>
+                <th>dist</th>
+                <th>hng</th>
+                <th>alt</th>
+                <th>act</th>
+                <th>frm</th>
+                <th>cmnt</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each steerpoints}}
+            <tr class="steerpoint">
+                <td>{{ steerpoint }}</td>
+                <td>{{ description.clone().unwrap_or_default() }}</td>
+                <td>{{ time.clone().unwrap_or_default() }}</td>
+                <td>{{ distance.unwrap_or_default() }}nm</td>
+                <td>{{ heading.unwrap_or_default() }}°</td>
+                <td>{{ altitude.clone().unwrap_or_default() }}</td>
+                <td>{{ action.clone().unwrap_or_default() }}</td>
+                <td>{{ form.clone().unwrap_or_default() }}</td>
+                <td>{{ comments.clone().unwrap_or_default() }}</td>
+            </tr>
+            {{~/each}}
+        </tbody>
+    </table>
+
+    <table>
+        <thead>
+            <tr>
+                <th colspan="10" class="leader">
+                    Comm Ladder
+                </th>
+            </tr>
+            <tr>
+                <th>agency</th>
+                <th>callsign</th>
+                <th>UHF[ch]</th>
+                <th>VHF [ch]</th>
+                <th>notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each commladder}}
+            <tr class="comm">
+                <td>{{ agency }}</td>
+                <td>{{ callsign.clone().unwrap_or_default() }}</td>
+                <td>{{ uhf.clone().unwrap_or_default() }}</td>
+                <td>{{ vhf.clone().unwrap_or_default() }}</td>
+                <td>{{ notes.clone().unwrap_or_default() }}</td>
+            </tr>
+            {{~/each}}
+        </tbody>
+    </table>
+    <script defer>
+        let data = {
+            "message": "OpenKneeboard/SimHub/DashboardLoaded",
+            "data": {
+                "width": 1024,
+                "height": document.body.clientHeight,
+            }
+        };
+        console.log(data);
+
+        window?.chrome?.webview?.postMessage(data);
+    </script>
+</body>
+
+</html>
