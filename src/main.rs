@@ -17,7 +17,7 @@ use gameinfo::GameInfo;
 use notify::{recommended_watcher, RecursiveMode, Watcher};
 use serde::Serialize;
 use serde_type_name::type_name;
-use std::{fs::File, io::Read, net::SocketAddr, result::Result, sync::OnceLock};
+use std::{fs::File, io::Read, net::SocketAddr, path::PathBuf, result::Result, sync::OnceLock};
 use tokio::sync::broadcast::{channel, Receiver, Sender};
 use tokio_stream::{
     wrappers::{errors::BroadcastStreamRecvError, BroadcastStream},
@@ -34,6 +34,8 @@ struct Args {
     /// Webserver listen address:port
     #[arg(short, long, default_value_t = listen_address())]
     listen: SocketAddr,
+    /// Override Falcon BMS Path
+    bms_path: Option<PathBuf>,
 }
 
 fn listen_address() -> SocketAddr {
@@ -75,15 +77,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     })
     .unwrap();
 
-    let mut briefing = game_info.base_dir.clone();
+    // let mut briefing = &args.bms_path.unwrap_or(game_info.base_dir.clone());
+
+    let mut briefing = args
+        .bms_path
+        .as_ref()
+        .unwrap_or(&game_info.base_dir)
+        .clone();
+
     briefing.push("User");
     briefing.push("Briefings");
     briefing.push("briefing.txt");
 
+    if let Err(e) = watcher.watch(briefing.as_path(), RecursiveMode::NonRecursive) {
+        eprintln!("{}\n\"{}\"", e, briefing.to_string_lossy());
+        return Ok(());
+    }
+
     println!("Watching [{}] for changes", briefing.to_string_lossy());
-    watcher
-        .watch(briefing.as_path(), RecursiveMode::NonRecursive)
-        .unwrap();
 
     tokio::signal::ctrl_c().await.unwrap();
     println!("No longer watching...");
