@@ -17,7 +17,10 @@ use gameinfo::GameInfo;
 use notify::{recommended_watcher, RecursiveMode, Watcher};
 use serde::Serialize;
 use serde_type_name::type_name;
-use std::{fs::File, io::Read, net::SocketAddr, path::PathBuf, result::Result, sync::OnceLock};
+use std::{
+    fs::File, io::Read, net::SocketAddr, path::PathBuf, result::Result, sync::OnceLock,
+    thread::sleep, time::Duration,
+};
 use tokio::sync::broadcast::{channel, Receiver, Sender};
 use tokio_stream::{
     wrappers::{errors::BroadcastStreamRecvError, BroadcastStream},
@@ -46,15 +49,13 @@ fn listen_address() -> SocketAddr {
 }
 
 static ARGS: OnceLock<Args> = OnceLock::new();
+static GAME_INFO: OnceLock<GameInfo> = OnceLock::new();
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
     let args = ARGS.get_or_init(move || args);
-
-    let Some(game_info) = GameInfo::new() else {
-        panic!("Falcon BMS 4.37 not detected. Aborting!");
-    };
+    let game_info = get_game_path(args.bms_path.as_ref());
 
     let sse_service = SseService::new();
 
@@ -71,8 +72,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         axum::serve(listener, app).await.unwrap();
     });
 
+    let sse_service_1 = sse_service.clone();
     let mut watcher = recommended_watcher(move |res| match res {
-        Ok(_) => sse_service.push(&Poke {}).unwrap(),
+        Ok(_) => sse_service_1.push(&Poke {}).unwrap(),
         Err(e) => println!("watch error: {:?}", e),
     })
     .unwrap();
@@ -89,12 +91,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     briefing.push("Briefings");
     briefing.push("briefing.txt");
 
-    if let Err(e) = watcher.watch(briefing.as_path(), RecursiveMode::NonRecursive) {
-        eprintln!("{}\n\"{}\"", e, briefing.to_string_lossy());
-        return Ok(());
-    }
-
     println!("Watching [{}] for changes", briefing.to_string_lossy());
+    loop {
+        if watcher
+            .watch(briefing.as_path(), RecursiveMode::NonRecursive)
+            .is_ok()
+        {
+            sse_service.push(&Poke {}).unwrap();
+            break;
+        }
+        sleep(Duration::from_millis(300));
+        // File doesn't exist (yet) wait for it.
+    }
 
     tokio::signal::ctrl_c().await.unwrap();
     println!("No longer watching...");
@@ -110,7 +118,7 @@ pub struct Index {
 }
 
 async fn index() -> Html<String> {
-    let Some(game_info) = GameInfo::new() else {
+    let Some(game_info) = GAME_INFO.get() else {
         return Html("404".to_string());
     };
     // User/Briefings/briefing.txt";
@@ -123,7 +131,15 @@ async fn index() -> Html<String> {
         Ok(e) => e,
         Err(e) => {
             println!("{:?}", e);
-            return Html(String::from("501"));
+            return Html(
+                Index {
+                    package_elements: vec![],
+                    steerpoints: vec![],
+                    commladder: vec![],
+                }
+                .call()
+                .unwrap(),
+            );
         }
     };
 
@@ -186,4 +202,80 @@ async fn sse(
     Extension(sse): Extension<SseService>,
 ) -> Sse<impl Stream<Item = Result<Event, BroadcastStreamRecvError>>> {
     Sse::new(BroadcastStream::new(sse.subscribe())).keep_alive(KeepAlive::default())
+}
+
+fn get_game_path(bms_path: Option<&PathBuf>) -> &'static GameInfo {
+    GAME_INFO.get_or_init(move || {
+        if let Some(bms_path) = bms_path {
+            return GameInfo {
+                base_dir: bms_path.clone(),
+                theater: String::new(),
+                callsign: String::new(),
+                name: String::new(),
+            };
+        }
+
+        let versions = GameInfo::versions();
+
+        if versions.len() == 1 {
+            return versions.first().unwrap().clone();
+        }
+
+        // there are more
+        use bms_sm::*;
+
+        println!("Multiple BMS installations detected");
+        println!("Waiting for Falcon BMS");
+
+        let mut strings = StringData::read();
+        loop {
+            if strings.is_ok() && !strings.as_ref().unwrap()[&StringId::BmsBasedir].is_empty() {
+                break;
+            }
+            sleep(Duration::from_secs(1));
+            strings = StringData::read();
+        }
+        let strings = strings.unwrap();
+
+        GameInfo {
+            base_dir: strings[&StringId::BmsBasedir].clone().into(),
+            theater: strings[&StringId::ThrName].clone(),
+            callsign: String::new(),
+            name: String::new(),
+        }
+
+        // for (i, version) in versions.iter().enumerate() {
+        //     println!("  {}: {:?}", i + 1, version.base_dir);
+        // }
+        // println!("  q: quit");
+        // let version: usize;
+        // loop {
+        //     print!("> ");
+        //     let _ = std::io::stdout().flush();
+
+        //     let mut buffer = String::new();
+        //     let stdin = std::io::stdin(); // We get `Stdin` here.
+        //     stdin.read_line(&mut buffer).unwrap();
+
+        //     match buffer.as_str().trim() {
+        //         "q" => std::process::exit(0),
+        //         d => match d.parse::<i32>() {
+        //             Err(_) => {
+        //                 continue;
+        //             }
+        //             Ok(d) => {
+        //                 if ((d - 1) as usize) >= versions.len() {
+        //                     continue;
+        //                 }
+
+        //                 version = (d - 1) as usize;
+
+        //                 break;
+        //             }
+        //         },
+        //     };
+        // }
+
+        // versions[version].clone()
+    })
 }

@@ -7,7 +7,7 @@ edition.workspace = true
 members = [".", "bms-briefing-parser"]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.1.2"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -27,6 +27,7 @@ notify = "6.1.1"
 encoding_rs = "0.8.33"
 encoding_rs_io = "0.1.7"
 clap = { version = "4.5.2", features = ["derive"] }
+bms-sm = "0.1.1"
 
 [build-dependencies]
 yarte = { version = "0.15", features = ["bytes-buf", "json"] }
