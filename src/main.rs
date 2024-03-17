@@ -97,7 +97,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .watch(briefing.as_path(), RecursiveMode::NonRecursive)
             .is_ok()
         {
-            sse_service.push(&Poke {}).unwrap();
+            let _ = sse_service.push(&Poke {});
             break;
         }
         sleep(Duration::from_millis(300));
