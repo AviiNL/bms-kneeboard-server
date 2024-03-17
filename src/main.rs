@@ -74,7 +74,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let sse_service_1 = sse_service.clone();
     let mut watcher = recommended_watcher(move |res| match res {
-        Ok(_) => sse_service_1.push(&Poke {}).unwrap(),
+        Ok(_) => {
+            let _ = sse_service_1.push(&Poke {});
+        }
         Err(e) => println!("watch error: {:?}", e),
     })
     .unwrap();
