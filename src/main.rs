@@ -1,5 +1,3 @@
-mod gameinfo;
-
 use axum::{
     response::{
         sse::{Event, KeepAlive},
@@ -13,7 +11,6 @@ use clap::Parser;
 use convert_case::{Case, Casing};
 use encoding_rs::WINDOWS_1252;
 use encoding_rs_io::DecodeReaderBytesBuilder;
-use gameinfo::GameInfo;
 use notify::{recommended_watcher, RecursiveMode, Watcher};
 use serde::Serialize;
 use serde_type_name::type_name;
@@ -37,8 +34,8 @@ struct Args {
     /// Webserver listen address:port
     #[arg(short, long, default_value_t = listen_address())]
     listen: SocketAddr,
-    /// Override Falcon BMS Path
-    bms_path: Option<PathBuf>,
+    /// Override Falcon BMS Briefing Path
+    briefing_dir: Option<PathBuf>,
 }
 
 fn listen_address() -> SocketAddr {
@@ -49,13 +46,13 @@ fn listen_address() -> SocketAddr {
 }
 
 static ARGS: OnceLock<Args> = OnceLock::new();
-static GAME_INFO: OnceLock<GameInfo> = OnceLock::new();
+static BRIEFING_PATH: OnceLock<PathBuf> = OnceLock::new();
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
     let args = ARGS.get_or_init(move || args);
-    let game_info = get_game_path(args.bms_path.as_ref());
+    let briefing_path = get_briefings_path(args.briefing_dir.as_ref());
 
     let sse_service = SseService::new();
 
@@ -68,7 +65,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let listener = tokio::net::TcpListener::bind(args.listen).await.unwrap();
 
     tokio::spawn(async move {
-        println!("listening on http://{}", listener.local_addr().unwrap());
+        println!("Listening on http://{}", listener.local_addr().unwrap());
         axum::serve(listener, app).await.unwrap();
     });
 
@@ -81,16 +78,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     })
     .unwrap();
 
-    // let mut briefing = &args.bms_path.unwrap_or(game_info.base_dir.clone());
-
-    let mut briefing = args
-        .bms_path
-        .as_ref()
-        .unwrap_or(&game_info.base_dir)
-        .clone();
-
-    briefing.push("User");
-    briefing.push("Briefings");
+    let mut briefing = args.briefing_dir.as_ref().unwrap_or(briefing_path).clone();
     briefing.push("briefing.txt");
 
     println!("Watching [{}] for changes", briefing.to_string_lossy());
@@ -120,13 +108,11 @@ pub struct Index {
 }
 
 async fn index() -> Html<String> {
-    let Some(game_info) = GAME_INFO.get() else {
+    let Some(briefing_path) = BRIEFING_PATH.get() else {
         return Html("404".to_string());
     };
     // User/Briefings/briefing.txt";
-    let mut briefing = game_info.base_dir.clone();
-    briefing.push("User");
-    briefing.push("Briefings");
+    let mut briefing = briefing_path.clone();
     briefing.push("briefing.txt");
 
     let briefing = match File::open(briefing) {
@@ -206,32 +192,22 @@ async fn sse(
     Sse::new(BroadcastStream::new(sse.subscribe())).keep_alive(KeepAlive::default())
 }
 
-fn get_game_path(bms_path: Option<&PathBuf>) -> &'static GameInfo {
-    GAME_INFO.get_or_init(move || {
+fn get_briefings_path(bms_path: Option<&PathBuf>) -> &PathBuf {
+    BRIEFING_PATH.get_or_init(move || {
         if let Some(bms_path) = bms_path {
-            return GameInfo {
-                base_dir: bms_path.clone(),
-                theater: String::new(),
-                callsign: String::new(),
-                name: String::new(),
-            };
-        }
-
-        let versions = GameInfo::versions();
-
-        if versions.len() == 1 {
-            return versions.first().unwrap().clone();
+            return bms_path.clone();
         }
 
         // there are more
         use bms_sm::*;
 
-        println!("Multiple BMS installations detected");
         println!("Waiting for Falcon BMS");
 
         let mut strings = StringData::read();
         loop {
-            if strings.is_ok() && !strings.as_ref().unwrap()[&StringId::BmsBasedir].is_empty() {
+            if strings.is_ok()
+                && !strings.as_ref().unwrap()[&StringId::BmsBriefingsDirectory].is_empty()
+            {
                 break;
             }
             sleep(Duration::from_secs(1));
@@ -239,45 +215,6 @@ fn get_game_path(bms_path: Option<&PathBuf>) -> &'static GameInfo {
         }
         let strings = strings.unwrap();
 
-        GameInfo {
-            base_dir: strings[&StringId::BmsBasedir].clone().into(),
-            theater: strings[&StringId::ThrName].clone(),
-            callsign: String::new(),
-            name: String::new(),
-        }
-
-        // for (i, version) in versions.iter().enumerate() {
-        //     println!("  {}: {:?}", i + 1, version.base_dir);
-        // }
-        // println!("  q: quit");
-        // let version: usize;
-        // loop {
-        //     print!("> ");
-        //     let _ = std::io::stdout().flush();
-
-        //     let mut buffer = String::new();
-        //     let stdin = std::io::stdin(); // We get `Stdin` here.
-        //     stdin.read_line(&mut buffer).unwrap();
-
-        //     match buffer.as_str().trim() {
-        //         "q" => std::process::exit(0),
-        //         d => match d.parse::<i32>() {
-        //             Err(_) => {
-        //                 continue;
-        //             }
-        //             Ok(d) => {
-        //                 if ((d - 1) as usize) >= versions.len() {
-        //                     continue;
-        //                 }
-
-        //                 version = (d - 1) as usize;
-
-        //                 break;
-        //             }
-        //         },
-        //     };
-        // }
-
-        // versions[version].clone()
+        strings[&StringId::BmsBriefingsDirectory].clone().into()
     })
 }

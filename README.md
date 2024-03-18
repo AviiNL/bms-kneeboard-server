@@ -7,14 +7,14 @@ BMS-Kneeboard-Server is a tool that transforms Falcon BMS's `briefing.txt` into 
 
 ## Usage
 
-By default, when you run `bms-kneeboard-server.exe` it'll autodetect your Falcon BMS installation, if multiple installations are detected, for example, if you have 4.36 and 4.37 installed side-by-side, the server will wait for you to start one of the games and automatically pick up which one you've started.
+By default, when you run `bms-kneeboard-server.exe` it'll autodetect your Falcon BMS installation, the server will wait for you to start one of the games and automatically pick up which one you've started. Alternatively, you can set the path of the briefings directory to something arbitrary as the first argument. `bms-kneeboard-server.exe "C:\Some Dir\Where\Briefings\Are"`
 
 The full output from the server's console window will look something like this:
 
 ```
 Multiple BMS installations detected
 Waiting for Falcon BMS
-listening on http://127.0.0.1:7878
+Listening on http://127.0.0.1:7878
 Watching [D:\Games\Falcon BMS 4.37\User\Briefings\briefing.txt] for changes
 ```
 
@@ -33,10 +33,10 @@ If all is well, you should see something like this:
 ## Command-line arguments
 
 ```
-Usage: bms-kneeboard-server.exe [OPTIONS] [BMS_PATH]
+Usage: bms-kneeboard-server.exe [OPTIONS] [BRIEFING_DIR]
 
 Arguments:
-  [BMS_PATH]  Override Falcon BMS Path
+  [BRIEFING_DIR]  Override Falcon BMS Briefing Path
 
 Options:
   -l, --listen <LISTEN>  Webserver listen address:port [default: 127.0.0.1:7878]
