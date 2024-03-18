@@ -34,7 +34,7 @@ struct Args {
     /// Webserver listen address:port
     #[arg(short, long, default_value_t = listen_address())]
     listen: SocketAddr,
-    /// Override Falcon BMS Briefing Path
+    /// Override directory containing briefing.txt
     briefing_dir: Option<PathBuf>,
 }
 
