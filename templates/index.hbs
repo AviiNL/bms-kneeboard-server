@@ -192,7 +192,11 @@
         };
         console.log(data);
 
+        // Backwards compatibility pre 1.8
         window?.chrome?.webview?.postMessage(data);
+
+        // 1.8 and up will support this method to set size
+        window?.OpenKneeboard?.SetPreferredPixelSize(1024, document.body.clientHeight);
     </script>
 </body>
 
