@@ -140,12 +140,24 @@ async fn index() -> Html<String> {
         println!("{:?}", e);
         return Html(String::from("501"));
     }
+    let mut commladder = Comm::from_briefing(&buf);
+
+    commladder.iter_mut().for_each(|c| {
+        if let Some(callsign) = c.callsign.as_mut() {
+            if let Some(c) = callsign
+                .split(|c: char| !c.is_alphanumeric() && !c.is_whitespace() && c != '-')
+                .next()
+            {
+                *callsign = c.to_string();
+            }
+        };
+    });
 
     Html(
         Index {
             package_elements: PackageElement::from_briefing(&buf),
             steerpoints: Steerpoint::from_briefing(&buf),
-            commladder: Comm::from_briefing(&buf),
+            commladder,
         }
         .call()
         .unwrap(),

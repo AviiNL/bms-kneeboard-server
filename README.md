@@ -44,6 +44,9 @@ Options:
   -V, --version          Print version
 ```
 
+### Hidden feature (ssh, don't tell anyone)
+If you append `#width=2048` or some other number to the url `http://127.0.0.1:7878/#width=...` you can override the rendering width of the page.
+
 [find-local-ip]: https://support.microsoft.com/en-us/windows/find-your-ip-address-in-windows-f21a9bbc-c582-55cd-35e0-73431160a1b9
 [config-manager]: assets/config-manager.png
 [preview]: assets/preview.png

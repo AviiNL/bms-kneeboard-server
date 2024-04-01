@@ -183,20 +183,44 @@
         </tbody>
     </table>
     <script defer>
-        let data = {
-            "message": "OpenKneeboard/SimHub/DashboardLoaded",
-            "data": {
-                "width": 1024,
-                "height": document.body.clientHeight,
+
+        // http://127.0.0.1:7878/#width=2048
+        {
+            let h = window.location.hash;
+            let settings = {};
+            if (h.length > 0) {
+                h = h.substring(1);
+                const parts = h.split('&');
+                for (const part of parts) {
+                    console.log(part);
+                    const kvp = part.split('=');
+                    if (kvp.length == 2) {
+                        let value = kvp[1];
+                        try {
+                            settings[kvp[0]] = JSON.parse(kvp[1]);
+                        } catch (e) {
+                            settings[kvp[0]] = kvp[1];
+                        }
+                    }
+                }
             }
-        };
-        console.log(data);
 
-        // Backwards compatibility pre 1.8
-        window?.chrome?.webview?.postMessage(data);
+            let page_width = settings.width || 1024;
 
-        // 1.8 and up will support this method to set size
-        window?.OpenKneeboard?.SetPreferredPixelSize(1024, document.body.clientHeight);
+            let data = {
+                "message": "OpenKneeboard/SimHub/DashboardLoaded",
+                "data": {
+                    "width": page_width,
+                    "height": document.body.clientHeight,
+                }
+            };
+
+            // Backwards compatibility pre 1.8
+            window?.chrome?.webview?.postMessage(data);
+
+            // 1.8 and up will support this method to set size
+            window?.OpenKneeboard?.SetPreferredPixelSize(page_width, document.body.clientHeight);
+        }
     </script>
 </body>
 
