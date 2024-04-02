@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMS Kneeboard</title>
+
+    <script>
+        const evtSource = new EventSource("/sse");
+        evtSource.addEventListener("poke", (e) => {
+            location.reload();
+        });
+    </script>
+
+    <style>
+        html,
+        body {
+            background-color: #FFF;
+            font-family: sans-serif;
+            font-size: 14pt;
+            margin: 0px;
+        }
+
+
+        table {
+            width: 100%;
+            border-spacing: 1px;
+            border-collapse: separate;
+            border-color: #FFF;
+        }
+
+        th {
+            font-variant: small-caps;
+        }
+
+        th {
+            background: #CCC;
+        }
+
+        th.leader {
+            background: #000;
+            color: #FFF;
+        }
+
+        td {
+            text-align: left;
+            padding: 1px 2px;
+        }
+
+        tr.steerpoint td:first-child {
+            text-align: center;
+        }
+
+        tr.steerpoint {
+            background-color: #CEE;
+        }
+
+        tr.steerpoint:nth-child(odd) {
+            background-color: #ACC;
+        }
+
+        tr.comm {
+            background-color: #ECE;
+        }
+
+        tr.comm:nth-child(odd) {
+            background-color: #CAC;
+        }
+
+        tr.element {
+            background-color: #ECE;
+        }
+
+        tr.element td:first-child {
+            text-align: center;
+        }
+
+        tr.element.primary {
+            font-weight: bold;
+        }
+
+        tr.element:nth-child(odd) {
+            background-color: #ECC;
+        }
+    </style>
+</head>
+
+<body>
+{% include "elements.html.twig" %}
+{% include "steerpoints.html.twig" %}
+{% include "commladder.html.twig" %}
+</body>
+
+</html>

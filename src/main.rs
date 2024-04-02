@@ -1,3 +1,5 @@
+mod html;
+
 use axum::{
     response::{
         sse::{Event, KeepAlive},
@@ -18,12 +20,12 @@ use std::{
     fs::File, io::Read, net::SocketAddr, path::PathBuf, result::Result, sync::OnceLock,
     thread::sleep, time::Duration,
 };
+use tera::Context;
 use tokio::sync::broadcast::{channel, Receiver, Sender};
 use tokio_stream::{
     wrappers::{errors::BroadcastStreamRecvError, BroadcastStream},
     Stream,
 };
-use yarte::*;
 
 #[derive(Serialize)]
 struct Poke;
@@ -91,20 +93,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             break;
         }
         sleep(Duration::from_millis(300));
-        // File doesn't exist (yet) wait for it.
     }
 
     tokio::signal::ctrl_c().await.unwrap();
     println!("No longer watching...");
     Ok(())
-}
-
-#[derive(Template, Serialize)]
-#[template(path = "index.hbs")]
-pub struct Index {
-    pub package_elements: Vec<PackageElement>,
-    pub steerpoints: Vec<Steerpoint>,
-    pub commladder: Vec<Comm>,
 }
 
 async fn index() -> Html<String> {
@@ -115,19 +108,27 @@ async fn index() -> Html<String> {
     let mut briefing = briefing_path.clone();
     briefing.push("briefing.txt");
 
+    let render = html::RenderOptions::default();
+
+    let mut context = Context::new();
+
     let briefing = match File::open(briefing) {
         Ok(e) => e,
         Err(e) => {
-            println!("{:?}", e);
-            return Html(
-                Index {
-                    package_elements: vec![],
-                    steerpoints: vec![],
-                    commladder: vec![],
+            dbg!(e);
+            context.insert("elements", &Vec::<PackageElement>::new());
+            context.insert("steerpoints", &Vec::<Steerpoint>::new());
+            context.insert("commladder", &Vec::<Comm>::new());
+
+            let render = match render.render(context) {
+                Ok(e) => e,
+                Err(e) => {
+                    println!("{:?}", e);
+                    return Html(String::from("501"));
                 }
-                .call()
-                .unwrap(),
-            );
+            };
+
+            return Html(render);
         }
     };
 
@@ -140,6 +141,7 @@ async fn index() -> Html<String> {
         println!("{:?}", e);
         return Html(String::from("501"));
     }
+
     let mut commladder = Comm::from_briefing(&buf);
 
     commladder.iter_mut().for_each(|c| {
@@ -153,15 +155,19 @@ async fn index() -> Html<String> {
         };
     });
 
-    Html(
-        Index {
-            package_elements: PackageElement::from_briefing(&buf),
-            steerpoints: Steerpoint::from_briefing(&buf),
-            commladder,
+    context.insert("elements", &PackageElement::from_briefing(&buf));
+    context.insert("steerpoints", &Steerpoint::from_briefing(&buf));
+    context.insert("commladder", &commladder);
+
+    let render = match render.render(context) {
+        Ok(e) => e,
+        Err(e) => {
+            println!("{:?}", e);
+            return Html(String::from("501"));
         }
-        .call()
-        .unwrap(),
-    )
+    };
+
+    Html(render)
 }
 
 #[derive(Debug, Clone)]

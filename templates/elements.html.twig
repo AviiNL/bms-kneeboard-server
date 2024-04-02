@@ -1,0 +1,31 @@
+{% if elements %}
+<table>
+    <thead>
+        <tr>
+            <th colspan="10" class="leader">
+                Package Elements
+            </th>
+        </tr>
+        <tr>
+            <th>#</th>
+            <th>callsign</th>
+            <th>flight #</th>
+            <th>Role</th>
+            <th>aircraft</th>
+            <th>task</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for element in elements %}
+        <tr class="element{% if element.is_primary %} primary{% endif %}">
+            <td>{{ loop.index }}</td>
+            <td>{{ element.callsign }}</td>
+            <td>{{ element.flight }}</td>
+            <td>{{ element.role }}</td>
+            <td>{{ element.aircraft }}</td>
+            <td>{{ element.task }}°</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}

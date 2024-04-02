@@ -1,0 +1,37 @@
+{% if steerpoints %}
+<table>
+    <thead>
+        <tr>
+            <th colspan="10" class="leader">
+                Steerpoints
+            </th>
+        </tr>
+        <tr>
+            <th>#</th>
+            <th>desc</th>
+            <th>time</th>
+            <th>dist</th>
+            <th>hng</th>
+            <th>alt</th>
+            <th>act</th>
+            <th>frm</th>
+            <th>cmnt</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for sp in steerpoints %}
+        <tr class="steerpoint">
+            <td>{{ sp.steerpoint }}</td>
+            <td>{{ sp.description }}</td>
+            <td>{{ sp.time }}</td>
+            <td>{{ sp.distance }}nm</td>
+            <td>{{ sp.heading }}°</td>
+            <td>{{ sp.altitude }}</td>
+            <td>{{ sp.action }}</td>
+            <td>{{ sp.form }}</td>
+            <td>{{ sp.comments }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}

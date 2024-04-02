@@ -1,0 +1,29 @@
+{% if commladder %}
+<table>
+    <thead>
+        <tr>
+            <th colspan="10" class="leader">
+                Comm Ladder
+            </th>
+        </tr>
+        <tr>
+            <th>agency</th>
+            <th>callsign</th>
+            <th>UHF[ch]</th>
+            <th>VHF [ch]</th>
+            <th>notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for comm in commladder %}
+        <tr class="comm">
+            <td>{{ comm.agency }}</td>
+            <td>{{ comm.callsign }}</td>
+            <td>{{ comm.uhf }}</td>
+            <td>{{ comm.vhf }}</td>
+            <td>{{ comm.notes }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
