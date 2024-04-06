@@ -1,56 +1,49 @@
+use std::collections::HashMap;
+
 use once_cell::sync::Lazy;
-use tera::{Context, Tera};
+use tera::{to_value, Context, Result as TeraResult, Tera, Value};
+
+macro_rules! add_template {
+    ($tera:expr, $x:literal) => {
+        $tera
+            .add_raw_template(
+                concat!($x, ".html.twig"),
+                include_str!(concat!("../templates/", $x, ".html.twig")),
+            )
+            .unwrap();
+    };
+}
 
 static TERA: Lazy<Tera> = Lazy::new(|| {
     let mut tera = Tera::default();
-    tera.add_raw_template(
-        "index.html.twig",
-        include_str!("../templates/index.html.twig"),
-    )
-    .unwrap();
-    tera.add_raw_template(
-        "elements.html.twig",
-        include_str!("../templates/elements.html.twig"),
-    )
-    .unwrap();
-    tera.add_raw_template(
-        "steerpoints.html.twig",
-        include_str!("../templates/steerpoints.html.twig"),
-    )
-    .unwrap();
-    tera.add_raw_template(
-        "commladder.html.twig",
-        include_str!("../templates/commladder.html.twig"),
-    )
-    .unwrap();
+    add_template!(tera, "index");
+    add_template!(tera, "overview");
+    add_template!(tera, "sitrep");
+    add_template!(tera, "roster");
+    add_template!(tera, "elements");
+    add_template!(tera, "threatanalysis");
+    add_template!(tera, "steerpoints");
+    add_template!(tera, "commladder");
+    add_template!(tera, "iff");
+    add_template!(tera, "ordnance");
+    add_template!(tera, "weather");
+    add_template!(tera, "support");
+    add_template!(tera, "roe");
+    add_template!(tera, "emergency");
 
-    // tera.register_filter("iconize", iconize);
-    // tera.register_filter("from_ico", from_ico);
-    // tera.register_filter("size", size);
-    // tera.register_filter("time", time);
-    // tera.register_filter("md", md);
+    tera.register_filter("nl2br", nl2br);
 
     tera
 });
 
-pub struct RenderOptions {
-    pub show_elements: bool,
-    pub eneble_steerpoints: bool,
-    pub show_comm_ladder: bool,
+fn nl2br(value: &Value, _args: &HashMap<String, Value>) -> TeraResult<Value> {
+    let Some(value) = value.as_str() else {
+        return Ok(value.clone());
+    };
+
+    Ok(to_value(value.replace('\n', "<br/>")).unwrap())
 }
 
-impl Default for RenderOptions {
-    fn default() -> Self {
-        Self {
-            show_elements: true,
-            eneble_steerpoints: true,
-            show_comm_ladder: true,
-        }
-    }
-}
-
-impl RenderOptions {
-    pub fn render(&self, context: Context) -> Result<String, Box<dyn std::error::Error>> {
-        Ok(TERA.render("index.html.twig", &context)?)
-    }
+pub fn render(context: Context) -> Result<String, Box<dyn std::error::Error>> {
+    Ok(TERA.render("index.html.twig", &context)?)
 }

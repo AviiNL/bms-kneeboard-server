@@ -1,0 +1,22 @@
+<style>
+    :root {
+        --sitrep-background: rgb(214, 179, 179);
+        --sitrep-foreground: #000;
+    }
+
+    tr.sitrep {
+        background-color: var(--sitrep-background);
+        color: var(--sitrep-foreground);
+    }
+</style>
+
+<table>
+    <caption class="leader">
+        Situation Report
+    </caption>
+    <tbody>
+        <tr class="sitrep">
+            <td>{{ sitrep | nl2br }}</td>
+        </tr>
+    </tbody>
+</table>

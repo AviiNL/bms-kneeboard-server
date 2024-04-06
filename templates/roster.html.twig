@@ -1,0 +1,44 @@
+<style>
+    :root {
+        --roster-background-primary: rgb(214, 179, 179);
+        --roster-background-secondary: rgb(179, 214, 212);
+        --roster-foreground-primary: #000;
+        --roster-foreground-secondary: #000;
+    }
+
+    tr.roster {
+        background-color: var(--roster-background-primary);
+        color: var(--roster-foreground-primary);
+    }
+
+    tr.roster:nth-child(even) {
+        background-color: var(--roster-background-secondary);
+        color: var(--roster-foreground-secondary);
+    }
+</style>
+
+<table>
+    <caption class="leader">
+        Pilot Roster
+    </caption>
+    <thead>
+        <tr>
+            <th>callsign</th>
+            <th>lead</th>
+            <th>wing</th>
+            <th>element</th>
+            <th>four</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for group in roster %}
+        <tr class="roster{% if group.primary %} primary{% endif %}">
+            <td>{{ group.callsign }}</td>
+            <td>{{ group.lead }}</td>
+            <td>{{ group.wing }}</td>
+            <td>{{ group.element }}</td>
+            <td>{{ group.four }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

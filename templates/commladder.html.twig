@@ -1,15 +1,31 @@
-{% if commladder %}
+<style>
+    :root {
+        --commladder-background-primary: rgb(214, 179, 179);
+        --commladder-background-secondary: rgb(179, 214, 212);
+        --commladder-foreground-primary: #000;
+        --commladder-foreground-secondary: #000;
+    }
+
+    tr.comm {
+        background-color: var(--commladder-background-primary);
+        color: var(--commladder-foreground-primary);
+    }
+
+    tr.comm:nth-child(even) {
+        background-color: var(--commladder-background-secondary);
+        color: var(--commladder-foreground-secondary);
+    }
+</style>
+
 <table>
+    <caption class="leader">
+        Comm Ladder
+    </caption>
     <thead>
-        <tr>
-            <th colspan="10" class="leader">
-                Comm Ladder
-            </th>
-        </tr>
         <tr>
             <th>agency</th>
             <th>callsign</th>
-            <th>UHF[ch]</th>
+            <th>UHF [ch]</th>
             <th>VHF [ch]</th>
             <th>notes</th>
         </tr>
@@ -26,4 +42,3 @@
         {% endfor %}
     </tbody>
 </table>
-{% endif %}

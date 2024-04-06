@@ -1,0 +1,69 @@
+:root {
+    /* Custom Variables */
+    --text-color-primary: #000;
+    --text-color-secondary: #000;
+
+    --single-page-background: #ccc;
+
+    --background-primary: rgb(214, 179, 179);
+    --background-secondary: rgb(179, 214, 212);
+
+    /* Built in variables */
+    --commladder-background-primary: var(--background-primary);
+    --commladder-background-secondary: var(--background-secondary);
+    --commladder-foreground-primary: var(--text-color-primary);
+    --commladder-foreground-secondary: var(--text-color-secondary);
+
+    --elements-background-primary: var(--background-primary);
+    --elements-background-secondary: var(--background-secondary);
+    --elements-foreground-primary: var(--text-color-primary);
+    --elements-foreground-secondary: var(--text-color-secondary);
+
+    --emergency-background: var(--single-page-background);
+    --emergency-foreground: var(--text-color-primary);
+
+    --iff-background-primary: var(--background-primary);
+    --iff-background-secondary: var(--background-secondary);
+    --iff-foreground-primary: var(--text-color-primary);
+    --iff-foreground-secondary: var(--text-color-secondary);
+
+    --ordnance-background-primary: var(--background-primary);
+    --ordnance-background-secondary: var(--background-secondary);
+    --ordnance-foreground-primary: var(--text-color-primary);
+    --ordnance-foreground-secondary: var(--text-color-secondary);
+
+    --overview-background-primary: var(--background-primary);
+    --overview-background-secondary: var(--background-secondary);
+    --overview-foreground-primary: var(--text-color-primary);
+    --overview-foreground-secondary: var(--text-color-secondary);
+
+    --roe-background: var(--single-page-background);
+    --roe-foreground: var(--text-color-primary);
+
+    --roster-background-primary: var(--background-primary);
+    --roster-background-secondary: var(--background-secondary);
+    --roster-foreground-primary: var(--text-color-primary);
+    --roster-foreground-secondary: var(--text-color-secondary);
+
+    --sitrep-background: var(--background-primary);
+    --sitrep-foreground: var(--text-color-primary);
+
+    --steerpoints-background-primary: var(--background-primary);
+    --steerpoints-background-secondary: var(--background-secondary);
+    --steerpoints-foreground-primary: var(--text-color-primary);
+    --steerpoints-foreground-secondary: var(--text-color-secondary);
+
+    --support-background-primary: var(--background-primary);
+    --support-background-secondary: var(--background-secondary);
+    --support-foreground-primary: var(--text-color-primary);
+    --support-foreground-secondary: var(--text-color-secondary);
+
+    --threat-background: var(--single-page-background);
+    --threat-foreground: var(--text-color-primary);
+
+    --weather-background-primary: var(--background-primary);
+    --weather-background-secondary: var(--background-secondary);
+    --weather-foreground-primary: var(--text-color-primary);
+    --weather-foreground-secondary: var(--text-color-secondary);
+
+}

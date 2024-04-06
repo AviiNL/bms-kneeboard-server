@@ -1,0 +1,108 @@
+<style>
+    :root {
+        --iff-background-primary: rgb(214, 179, 179);
+        --iff-background-secondary: rgb(179, 214, 212);
+        --iff-foreground-primary: #000;
+        --iff-foreground-secondary: #000;
+    }
+
+    tr.iff {
+        background-color: var(--iff-background-primary);
+        color: var(--iff-foreground-primary);
+    }
+
+    tr.iff:nth-child(even) {
+        background-color: var(--iff-background-secondary);
+        color: var(--iff-foreground-secondary);
+    }
+
+    tr.iff > td {
+        vertical-align: top;
+    }
+</style>
+<table>
+    <caption class="leader">
+        IFF - Initial
+    </caption>
+    <thead>
+        <tr>
+            <th>
+                modes active
+            </th>
+            <th>
+                codes
+            </th>
+            <th>
+                m4 validity until
+            </th>
+            <th>
+                iff policy
+            </th>
+            <th>
+                change settings
+            </th>
+            <th>
+                pos events
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="iff">
+            <td>
+                {{ iff.initial.modes_active }}
+            </td>
+            <td>
+                {% for code in iff.initial.codes %}
+                <p>{{ code }}</p>
+                {% endfor %}
+            </td>
+            <td>
+                {% for valid in iff.initial.m4_validity_time_until %}
+                <p>{{ valid }}</p>
+                {% endfor %}
+            </td>
+            <td>
+                {% for policy in iff.initial.iff_policy %}
+                <p>{{ policy }}</p>
+                {% endfor %}
+            </td>
+            <td>
+                {{ iff.initial.code_change_setting }}
+            </td>
+            <td>
+                {% for event in iff.pos_events %}
+                <p>{{ event }}</p>
+                {% endfor %}
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<table>
+    <caption class="leader">
+        IFF - Time Events
+    </caption>
+    <thead>
+        {% set row = iff.time_events | first %}
+        <tr>
+            {% for col in row %}
+            <th>
+                {{ col }}
+            </th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in iff.time_events %}
+        {% if loop.index == 1 %}{% continue %}{% endif %}
+            <tr class="iff">
+                {% for col in row %}
+                {% if loop.index == 2 %}{% continue %}{% endif %} {# the "first" column makes no sense, remove it #}
+                <td>
+                    {{ col }}
+                </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

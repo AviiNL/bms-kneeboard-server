@@ -1,0 +1,22 @@
+<style>
+    :root {
+        --roe-background: rgb(214, 179, 179);
+        --roe-foreground: #000;
+    }
+
+    tr.roe {
+        background-color: var(--roe-background);
+        color: var(--roe-foreground);
+    }
+</style>
+
+<table>
+    <caption class="leader">
+        Rules of Engagement
+    </caption>
+    <tbody>
+        <tr class="roe">
+            <td>{{ roe | nl2br }}</td>
+        </tr>
+    </tbody>
+</table>

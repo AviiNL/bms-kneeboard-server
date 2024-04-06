@@ -1,0 +1,22 @@
+<style>
+    :root {
+        --threat-background: rgb(214, 179, 179);
+        --threat-foreground: #000;
+    }
+
+    tr.threat {
+        background-color: var(--threat-background);
+        color: var(--threat-foreground);
+    }
+</style>
+
+<table>
+    <caption class="leader">
+        Threat Analysis
+    </caption>
+    <tbody>
+        <tr class="threat">
+            <td>{{ threatanalysis | nl2br }}</td>
+        </tr>
+    </tbody>
+</table>

@@ -1,0 +1,55 @@
+<style>
+    :root {
+        --overview-background-primary: rgb(214, 179, 179);
+        --overview-background-secondary: rgb(179, 214, 212);
+
+        --overview-foreground-primary: #000;
+        --overview-foreground-secondary: #000;
+    }
+
+    tr.overview {
+        background: var(--overview-background-primary);
+        color: var(--overview-foreground-primary);
+    }
+
+    tr.overview_secondary {
+        background: var(--overview-background-secondary);
+        color: var(--overview-foreground-secondary);
+    }
+</style>
+
+<table>
+    <caption class="leader">
+        Mission Overview - {{ overview.callsign }}
+    </caption>
+    <thead>
+        <tr>
+            <th>Mission Type</th>
+            <th>Package #</th>
+            <th>Description</th>
+            <th>Mission</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="overview">
+            <td style="text-align: center;">{{ overview.mission_type }}</td>
+            <td style="text-align: center;">{{ overview.package_id }}</td>
+            <td>{{ overview.package_description }}</td>
+            <td>{{ overview.package_mission }}</td>
+    <thead>
+        <tr>
+            <th>Target Area</th>
+            <th>Time on Target</th>
+            <th>Sunrise</th>
+            <th>Sunset</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="overview_secondary">
+            <td>{{ overview.target_area }}</td>
+            <td>{{ overview.time_on_target }}</td>
+            <td>{{ overview.sunrise }}</td>
+            <td>{{ overview.sunset }}</td>
+        </tr>
+    </tbody>
+</table>

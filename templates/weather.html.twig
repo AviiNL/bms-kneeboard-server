@@ -1,0 +1,46 @@
+<style>
+    :root {
+        --weather-background-primary: rgb(214, 179, 179);
+        --weather-background-secondary: rgb(179, 214, 212);
+        --weather-foreground-primary: #000;
+        --weather-foreground-secondary: #000;
+    }
+
+    tr.weather {
+        background-color: var(--weather-background-primary);
+        color: var(--weather-foreground-primary);
+    }
+
+    tr.weather:nth-child(even) {
+        background-color: var(--weather-background-secondary);
+        color: var(--weather-foreground-secondary);
+    }
+
+</style>
+
+<table>
+    <caption class="leader">
+        Weather
+    </caption>
+    {% for w in weather %}
+    {% if loop.first %}
+    <thead>
+        <tr>
+            {% for s in w %}
+            <th>{{ s | trim_end_matches(pat=":") | lower }}</th>
+            {% endfor %}
+        </tr>
+    </head>
+    <tbody>
+    {% continue %}
+    {% endif %}
+    <tr class="weather">
+        {% for s in w %}
+        <td>{{ s }}</td>
+        {% endfor %}
+    </tr>
+    {% if loop.last %}
+    </tbody>
+    {% endif %}
+    {% endfor %}
+</table>

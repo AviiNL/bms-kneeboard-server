@@ -1,0 +1,59 @@
+<style>
+    :root {
+        --ordnance-background-primary: rgb(214, 179, 179);
+        --ordnance-background-secondary: rgb(179, 214, 212);
+        --ordnance-foreground-primary: #000;
+        --ordnance-foreground-secondary: #000;
+    }
+
+    tr.ordnance {
+        background-color: var(--ordnance-background-primary);
+        color: var(--ordnance-foreground-primary);
+    }
+
+    tr.ordnance:nth-child(odd) {
+        background-color: var(--ordnance-background-secondary);
+        color: var(--ordnance-foreground-secondary);
+    }
+
+    .outer td {
+        margin: 0;
+        padding: 0;
+        vertical-align: top;
+        align: left;
+    }
+
+    td.title {
+        font-variant: small-caps;
+        background-color: #ccc;
+        text-align: center;
+    }
+    
+    td.primary {
+        font-weight: bold;
+    }
+</style>
+<table class="outer">
+    <caption class="leader">
+        Ordnance
+    </caption>
+    <tbody>
+    {% for group in ordnance.flights %}
+        <tr>
+            {% for ord in group %}
+            <td>
+                <table>
+                    {% for weap in ord %}
+                    <tr class="ordnance">
+                        <td{% if loop.index == 1 %} class="title{% if weap is starting_with(overview.callsign) %} primary{% endif %}"{% endif %}>
+                            {{ weap }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

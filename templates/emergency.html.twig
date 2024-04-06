@@ -1,0 +1,22 @@
+<style>
+    :root {
+        --emergency-background: rgb(214, 179, 179);
+        --emergency-foreground: #000;
+    }
+
+    tr.emergency {
+        background-color: var(--emergency-background);
+        color: var(--emergency-foreground);
+    }
+</style>
+
+<table>
+    <caption class="leader">
+        Emergency Procedures
+    </caption>
+    <tbody>
+        <tr class="emergency">
+            <td>{{ emergency | nl2br }}</td>
+        </tr>
+    </tbody>
+</table>

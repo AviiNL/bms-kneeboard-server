@@ -1,0 +1,44 @@
+<style>
+    :root {
+        --support-background-primary: rgb(214, 179, 179);
+        --support-background-secondary: rgb(179, 214, 212);
+        --support-foreground-primary: #000;
+        --support-foreground-secondary: #000;
+    }
+
+    tr.support {
+        background-color: var(--support-background-primary);
+        color: var(--support-foreground-primary);
+    }
+
+    tr.support:nth-child(even) {
+        background-color: var(--support-background-secondary);
+        color: var(--support-foreground-secondary);
+    }
+
+    tr.support td:first-child {
+        font-weight: bold;
+    }
+</style>
+
+<table>
+    <caption class="leader">
+        Support
+    </caption>
+    <thead>
+        <tr>
+            <th>callsign</th>
+            <th>type</th>
+            <th>description</th>
+        </tr>
+    </head>
+    <tbody>
+    {% for w in support %}
+    <tr class="support">
+        {% for s in w %}
+        <td>{{ s }}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>

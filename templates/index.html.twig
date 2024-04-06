@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BMS Kneeboard</title>
 
+
     <script>
         const evtSource = new EventSource("/sse");
         evtSource.addEventListener("poke", (e) => {
@@ -22,6 +23,10 @@
             margin: 0px;
         }
 
+        p {
+            margin: 0;
+            padding: 0;
+        }
 
         table {
             width: 100%;
@@ -30,7 +35,7 @@
             border-color: #FFF;
         }
 
-        th {
+        th, caption {
             font-variant: small-caps;
         }
 
@@ -38,7 +43,7 @@
             background: #CCC;
         }
 
-        th.leader {
+        caption.leader {
             background: #000;
             color: #FFF;
         }
@@ -48,48 +53,111 @@
             padding: 1px 2px;
         }
 
-        tr.steerpoint td:first-child {
-            text-align: center;
-        }
-
-        tr.steerpoint {
-            background-color: #CEE;
-        }
-
-        tr.steerpoint:nth-child(odd) {
-            background-color: #ACC;
-        }
-
-        tr.comm {
-            background-color: #ECE;
-        }
-
-        tr.comm:nth-child(odd) {
-            background-color: #CAC;
-        }
-
-        tr.element {
-            background-color: #ECE;
-        }
-
-        tr.element td:first-child {
-            text-align: center;
-        }
-
-        tr.element.primary {
+        tr.primary {
             font-weight: bold;
         }
 
-        tr.element:nth-child(odd) {
-            background-color: #ECC;
+        div.message_container {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.5);
+        }
+        div.message {
+            flex: 1 1;
+            text-align: center;
+            font-weight: bold;
+            font-size: 2.5em;
+            text-shadow: 5px 5px 10px rgba(0,0,0,0.25)
         }
     </style>
 </head>
 
 <body>
-{% include "elements.html.twig" %}
-{% include "steerpoints.html.twig" %}
-{% include "commladder.html.twig" %}
+{% if msg %}
+<div class="message_container"><div class="message">{{ msg }}</div></div>
+{% endif %}
+
+{% for sub in subs %}
+    {% set sub = sub | upper %}
+
+    {% if sub == 'MO' %}
+    {% include "overview.html.twig" %}
+    {% elif sub == 'SR' %}
+    {% include "sitrep.html.twig" %}
+    {% elif sub == 'PR' %}
+    {% include "roster.html.twig" %}
+    {% elif sub == 'PE' %}
+    {% include "elements.html.twig" %}
+    {% elif sub == 'TA' %}
+    {% include "threatanalysis.html.twig" %}
+    {% elif sub == 'SP' %}
+    {% include "steerpoints.html.twig" %}
+    {% elif sub == 'CL' %}
+    {% include "commladder.html.twig" %}
+    {% elif sub == 'IF' %}
+    {% include "iff.html.twig" %}
+    {% elif sub == 'OR' %}
+    {% include "ordnance.html.twig" %}
+    {% elif sub == 'WT' %}
+    {% include "weather.html.twig" %}
+    {% elif sub == 'SU' %}
+    {% include "support.html.twig" %}
+    {% elif sub == 'RO' %}
+    {% include "roe.html.twig" %}
+    {% elif sub == 'EP' %}
+    {% include "emergency.html.twig" %}
+    {% endif %}
+
+{% endfor %}
+
+<link rel="stylesheet" href="style.css" defer />
+<script defer>
+{
+    let h = window.location.hash;
+    // Defaults
+    let settings = {
+        width: 1024,
+    };
+    // Override from #width=...
+    if (h.length > 0) {
+        h = h.substring(1);
+        const parts = h.split('&');
+        for (const part of parts) {
+            console.log(part);
+            const kvp = part.split('=');
+            if (kvp.length == 2) {
+                let value = kvp[1];
+                try {
+                    settings[kvp[0]] = JSON.parse(kvp[1]);
+                } catch (e) {
+                    settings[kvp[0]] = kvp[1];
+                }
+            }
+        }
+    }
+
+    let max_height = settings.width * 1.415126050420168; // A4 (ish)
+    let height = Math.min(max_height, Math.max(768, document.body.clientHeight));
+
+    if (window.OpenKneeboard?.SetPreferredPixelSize) {
+        window.OpenKneeboard?.SetPreferredPixelSize(settings.width, height);
+    } else if (window.OpenKneeboard) {
+        window?.chrome?.webview?.postMessage({
+            "message": "OpenKneeboard/SimHub/DashboardLoaded",
+            "data": {
+                "width": settings.width,
+                "height": height,
+            }
+        });
+    }
+}
+</script>
 </body>
 
 </html>

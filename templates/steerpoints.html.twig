@@ -1,11 +1,31 @@
-{% if steerpoints %}
+<style>
+    :root {
+        --steerpoints-background-primary: rgb(214, 179, 179);
+        --steerpoints-background-secondary: rgb(179, 214, 212);
+        --steerpoints-foreground-primary: #000;
+        --steerpoints-foreground-secondary: #000;
+    }
+
+    tr.steerpoint {
+        background-color: var(--steerpoints-background-primary);
+        color: var(--steerpoints-foreground-primary);
+    }
+
+    tr.steerpoint:nth-child(even) {
+        background-color: var(--steerpoints-background-secondary);
+        color: var(--steerpoints-foreground-secondary);
+    }
+
+    tr.steerpoint td:first-child {
+        text-align: center;
+    }
+</style>
+
 <table>
+    <caption class="leader">
+        Steerpoints
+    </caption>
     <thead>
-        <tr>
-            <th colspan="10" class="leader">
-                Steerpoints
-            </th>
-        </tr>
         <tr>
             <th>#</th>
             <th>desc</th>
@@ -24,8 +44,8 @@
             <td>{{ sp.steerpoint }}</td>
             <td>{{ sp.description }}</td>
             <td>{{ sp.time }}</td>
-            <td>{{ sp.distance }}nm</td>
-            <td>{{ sp.heading }}°</td>
+            <td>{% if sp.distance %}{{ sp.distance }}nm{% endif %}</td>
+            <td>{% if sp.heading %}{{ sp.heading }}°{% endif %}</td>
             <td>{{ sp.altitude }}</td>
             <td>{{ sp.action }}</td>
             <td>{{ sp.form }}</td>
@@ -34,4 +54,3 @@
         {% endfor %}
     </tbody>
 </table>
-{% endif %}

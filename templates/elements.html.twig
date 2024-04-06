@@ -1,16 +1,36 @@
-{% if elements %}
+<style>
+    :root {
+        --elements-background-primary: rgb(214, 179, 179);
+        --elements-background-secondary: rgb(179, 214, 212);
+        --elements-foreground-primary: #000;
+        --elements-foreground-secondary: #000;
+    }
+
+    tr.element {
+        background-color: var(--elements-background-primary);
+        color: var(--elements-foreground-primary);
+    }
+
+    tr.element:nth-child(even) {
+        background-color: var(--elements-background-secondary);
+        color: var(--elements-foreground-secondary);
+    }
+    
+    tr.elements td:first-child {
+        text-align: center;
+    }
+</style>
+
 <table>
+    <caption class="leader">
+        Package Elements
+    </caption>
     <thead>
-        <tr>
-            <th colspan="10" class="leader">
-                Package Elements
-            </th>
-        </tr>
         <tr>
             <th>#</th>
             <th>callsign</th>
             <th>flight #</th>
-            <th>Role</th>
+            <th>role</th>
             <th>aircraft</th>
             <th>task</th>
         </tr>
@@ -19,13 +39,12 @@
         {% for element in elements %}
         <tr class="element{% if element.is_primary %} primary{% endif %}">
             <td>{{ loop.index }}</td>
-            <td>{{ element.callsign }}</td>
-            <td>{{ element.flight }}</td>
-            <td>{{ element.role }}</td>
-            <td>{{ element.aircraft }}</td>
-            <td>{{ element.task }}°</td>
+            <td>{{ element.callsign | nl2br }}</td>
+            <td>{{ element.flight | nl2br }}</td>
+            <td>{{ element.role | nl2br }}</td>
+            <td>{{ element.aircraft | nl2br }}</td>
+            <td>{{ element.task | nl2br }}°</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
-{% endif %}
