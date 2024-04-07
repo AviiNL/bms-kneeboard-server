@@ -17,7 +17,7 @@
     <style>
         html,
         body {
-            background-color: #FFF;
+            background-color: #000;
             font-family: sans-serif;
             font-size: 14pt;
             margin: 0px;
@@ -66,14 +66,14 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(0,0,0,0.5);
         }
         div.message {
+            color: #EEE;
             flex: 1 1;
             text-align: center;
             font-weight: bold;
             font-size: 2.5em;
-            text-shadow: 5px 5px 10px rgba(0,0,0,0.25)
+            text-shadow: 5px 5px 10px rgba(256,256,256,0.25)
         }
     </style>
 </head>
@@ -81,7 +81,7 @@
 <body>
 {% if msg %}
 <div class="message_container"><div class="message">{{ msg }}</div></div>
-{% endif %}
+{% else %}
 
 {% for sub in subs %}
     {% set sub = sub | upper %}
@@ -116,6 +116,7 @@
 
 {% endfor %}
 
+{% endif %}
 <link rel="stylesheet" href="style.css" defer />
 <script defer>
 {

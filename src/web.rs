@@ -115,13 +115,6 @@ async fn index_params(
     context.insert("subs", &subs);
 
     let Some(briefing) = briefing.as_ref() else {
-        context.insert("overview", &Overview::default());
-        context.insert("sitrep", &Sitrep("".to_string()));
-        context.insert("elements", &Vec::<PackageElement>::new());
-        context.insert("steerpoints", &Vec::<Steerpoint>::new());
-        context.insert("commladder", &Vec::<Comm>::new());
-        context.insert("commladder", &Vec::<Comm>::new());
-
         context.insert("msg", "Waiting for Falcon BMS to launch...");
 
         let render = match html::render(context) {
@@ -139,11 +132,6 @@ async fn index_params(
         Ok(e) => e,
         Err(e) => {
             dbg!(e);
-            context.insert("overview", &Overview::default());
-            context.insert("sitrep", &Sitrep("".to_string()));
-            context.insert("elements", &Vec::<PackageElement>::new());
-            context.insert("steerpoints", &Vec::<Steerpoint>::new());
-            context.insert("commladder", &Vec::<Comm>::new());
             context.insert("msg", "Waiting for briefing to be printed...");
 
             let render = match html::render(context) {

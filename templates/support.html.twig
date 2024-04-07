@@ -35,6 +35,7 @@
     <tbody>
     {% for w in support %}
     <tr class="support">
+    {% if w | length == 1 %}<td></td><td></td>{% endif %}
         {% for s in w %}
         <td>{{ s }}</td>
         {% endfor %}

@@ -1,3 +1,7 @@
+body {
+    background: black;
+}
+
 :root {
     /* Custom Variables */
     --text-color-primary: #000;

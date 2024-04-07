@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use serde::Serialize;
 
 #[derive(Default, Debug, Clone, Serialize)]
@@ -47,12 +49,21 @@ impl<'a> Overview<'a> {
             .map(|s| s.trim_matches(|c| c == ')'))
             .unwrap_or("");
 
-        let package_mission = lines[3].split(':').nth(1).unwrap_or("").trim();
-        let target_area = lines[4].split(':').nth(1).unwrap_or("").trim();
-        let time_on_target = lines[5].split_once(':').unwrap_or(("", "")).1.trim();
+        let mut data = HashMap::<&'a str, &'a str>::new();
 
-        let sunrise = lines[7].split_once(':').unwrap_or(("", "")).1.trim();
-        let sunset = lines[8].split_once(':').unwrap_or(("", "")).1.trim();
+        for line in lines.iter().skip(2) {
+            let l = line.split_once('\t').unwrap_or_default();
+            if !l.0.is_empty() {
+                data.insert(l.0.trim_matches(|c| c == ':'), l.1);
+            }
+        }
+
+        let package_mission = data.get("Pkg-Mission").unwrap_or(&"");
+        let sunset = data.get("Sunset").unwrap_or(&"");
+        let sunrise = data.get("Sunrise").unwrap_or(&"");
+
+        let target_area = data.get("Target Area").unwrap_or(&"");
+        let time_on_target = data.get("Time on Target").unwrap_or(&"");
 
         Self {
             callsign,
@@ -90,7 +101,7 @@ impl Sitrep {
     }
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Default, Debug, Clone, Serialize)]
 pub struct PilotRoster<'a> {
     pub primary: bool,
     pub callsign: &'a str,
