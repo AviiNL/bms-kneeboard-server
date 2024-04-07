@@ -33,3 +33,6 @@ tray-icon = "0.13.1"
 image = "0.25.1"
 winit = "0.29.15"
 open = "5.1.2"
+
+[build-dependencies]
+windres = "0.2.2"
