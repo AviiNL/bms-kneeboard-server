@@ -11,7 +11,6 @@ use std::{
     collections::HashMap,
     net::SocketAddr,
     path::PathBuf,
-    result::Result,
     sync::{Arc, RwLock},
     time::Duration,
 };
