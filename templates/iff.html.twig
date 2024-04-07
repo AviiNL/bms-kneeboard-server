@@ -85,6 +85,7 @@
     <thead>
         {% set row = iff.time_events | first %}
         <tr>
+            <th></th>
             {% for col in row %}
             <th>
                 {{ col }}
@@ -94,10 +95,9 @@
     </thead>
     <tbody>
         {% for row in iff.time_events %}
-        {% if loop.index == 1 %}{% continue %}{% endif %}
+            {% if loop.first %}{% continue %}{% endif %}
             <tr class="iff">
                 {% for col in row %}
-                {% if loop.index == 2 %}{% continue %}{% endif %} {# the "first" column makes no sense, remove it #}
                 <td>
                     {{ col }}
                 </td>
