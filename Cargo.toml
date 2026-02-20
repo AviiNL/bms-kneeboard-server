@@ -29,10 +29,12 @@ encoding_rs_io = "0.1.7"
 clap = { version = "4.5", features = ["derive"] }
 bms-sm = { version = "0.1.2" }
 futures = "0.3.30"
-tray-icon = "0.13.1"
 image = "0.25.1"
 winit = "0.29.15"
 open = "5.1.2"
 
-[build-dependencies]
+[target.'cfg(target_os = "windows")'.dependencies]
+tray-icon = "0.13.1"
+
+[target.'cfg(target_os = "windows")'.build-dependencies]
 windres = "0.2.2"

@@ -29,7 +29,7 @@ impl<'a> Overview<'a> {
             .unwrap_or(&"")
             .split(' ')
             .nth(1)
-            .map(|s| s.trim_matches(&['(', ')']))
+            .map(|s| s.trim_matches(['(', ')']))
             .unwrap_or("");
 
         let package_id: i32 = lines[2]
@@ -652,7 +652,7 @@ fn extract_group<'a>(text: &'a str, group_name: &str) -> Option<&'a str> {
     let mut current_line_start = 0;
     let mut current_group_start = 0;
 
-    for (i, c) in text.chars().enumerate() {
+    for (i, (_, c)) in text.char_indices().enumerate() {
         if current_line_start > i {
             continue;
         }
